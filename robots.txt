@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://coeurnohb-collab.github.io/coeurnoh-pro/sitemap.xml

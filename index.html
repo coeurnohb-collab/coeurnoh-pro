@@ -12,12 +12,26 @@
 <meta name="color-scheme" content="dark light">
 <meta name="format-detection" content="telephone=no, date=no, address=no, email=no">
 <meta name="description" content="Coeurnoh Pro — calculatrice tout-en-un : change de devises en temps réel, prêts, IMC, calories, mot de passe, devis/facture, marge, TVA et plus.">
+<meta name="keywords" content="calculatrice, change devises, taux de change RDC, devis facture, comptabilité OHADA, calculatrice pro, Cœurnohrad">
+<link rel="canonical" href="https://coeurnohb-collab.github.io/coeurnoh-pro/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Coeurnoh Pro — Calculatrice tout-en-un gratuite">
+<meta property="og:description" content="Change de devises en temps réel, devis/facture, comptabilité OHADA, inventaire, et bien plus — installable comme une vraie application, gratuite.">
+<meta property="og:url" content="https://coeurnohb-collab.github.io/coeurnoh-pro/">
+<meta property="og:image" content="https://coeurnohb-collab.github.io/coeurnoh-pro/icon-512.png">
+<meta property="og:locale" content="fr_FR">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Coeurnoh Pro — Calculatrice tout-en-un gratuite">
+<meta name="twitter:description" content="Change de devises en temps réel, devis/facture, comptabilité OHADA, inventaire, et bien plus.">
 <title>Coeurnoh Pro</title>
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
 <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js" defer></script>
 <style>
 :root{--bg:#0d0d0f;--s:#16161a;--s2:#1e1e24;--ac:#ff4d6d;--ac2:#7b2fff;--ac3:#00e5ff;--tx:#f0f0f5;--tx2:#888899;--gr:#00c896;--or:#ff8c42;--sat:env(safe-area-inset-top,0px);--sab:env(safe-area-inset-bottom,0px);--sal:env(safe-area-inset-left,0px);--sar:env(safe-area-inset-right,0px);}
 body.light{--bg:#f0f0f5;--s:#fff;--s2:#e2e2ec;--tx:#111118;--tx2:#555566;}
@@ -27,8 +41,8 @@ body{background:var(--bg);color:var(--tx);font-family:'Syne',-apple-system,'Sego
 button{touch-action:manipulation;-webkit-user-select:none;user-select:none;font-family:inherit;}
 input,select,textarea{-webkit-user-select:text;user-select:text;font-size:14px;}
 input[type=number]{-webkit-appearance:none;appearance:none;}
-.header{width:100%;max-width:480px;display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
-.logo{font-size:21px;font-weight:800;letter-spacing:-1px;background:linear-gradient(135deg,var(--ac),var(--ac2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.header{width:100%;max-width:480px;display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;row-gap:8px;}
+.logo{font-size:21px;font-weight:800;letter-spacing:-1px;background:linear-gradient(135deg,var(--ac),var(--ac2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;flex-shrink:0;}
 .logo span{font-size:9px;font-weight:400;display:block;color:var(--tx2);-webkit-text-fill-color:var(--tx2);letter-spacing:2px;text-transform:uppercase;}
 .hc{display:flex;gap:5px;}
 .cb{background:var(--s2);border:none;border-radius:7px;color:var(--tx2);padding:5px 9px;font-size:11px;cursor:pointer;font-family:'Syne',sans-serif;font-weight:700;transition:all .2s;}
@@ -66,6 +80,54 @@ input[type=number]{-webkit-appearance:none;appearance:none;}
 .dev-trow b{color:var(--tx);font-family:'Space Mono',monospace;}
 .dev-trow.tot{border-top:1px solid rgba(255,255,255,.08);margin-top:4px;padding-top:8px;font-size:15px;}
 .dev-trow.tot b{color:var(--ac);font-size:17px;}
+/* COMPTABILITÉ — journal & bilan */
+.cpt-row{display:grid;grid-template-columns:2fr .8fr .8fr auto;gap:5px;margin-bottom:5px;align-items:center;}
+.cpt-row .inp{font-size:11px;padding:8px 7px;}
+.cpt-head{display:grid;grid-template-columns:2fr .8fr .8fr auto;gap:5px;margin-bottom:5px;}
+.cpt-head span{font-size:8px;text-transform:uppercase;letter-spacing:.5px;color:var(--tx2);text-align:center;}
+.cpt-head span:first-child{text-align:left;}
+.bil-section{margin-bottom:14px;}
+.bil-title{font-size:12px;font-weight:800;color:var(--ac3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;}
+.bil-row{display:grid;grid-template-columns:2fr 1fr auto;gap:5px;margin-bottom:5px;align-items:center;}
+.bil-row .inp{font-size:11px;padding:8px 7px;}
+.bil-status{border-radius:11px;padding:12px 14px;margin-top:6px;text-align:center;font-weight:700;font-size:13px;}
+.bil-status.ok{background:rgba(0,200,150,.12);color:var(--gr);}
+.bil-status.bad{background:rgba(255,77,109,.12);color:var(--ac);}
+/* INVENTAIRE */
+.inv-row{background:var(--s2);border-radius:11px;padding:9px 10px;margin-bottom:7px;}
+.inv-row .inp{font-size:11px;padding:8px 7px;margin-bottom:5px;}
+.inv-grid{display:grid;grid-template-columns:.8fr 1fr 1fr 1fr auto;gap:5px;align-items:center;}
+.inv-grid .inp{margin-bottom:0;}
+.inv-grid-lbl{display:grid;grid-template-columns:.8fr 1fr 1fr 1fr auto;gap:5px;margin-bottom:3px;}
+.inv-grid-lbl span{font-size:7.5px;text-transform:uppercase;letter-spacing:.3px;color:var(--tx2);text-align:center;}
+/* MONDE — heure & météo */
+.md-suggest{margin-top:8px;background:var(--s);border:1px solid rgba(255,255,255,.08);border-radius:11px;overflow:hidden;}
+.md-suggest-item{padding:10px 12px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,.05);}
+.md-suggest-item:last-child{border-bottom:none;}
+.md-suggest-item:active{background:var(--s2);}
+.md-suggest-item b{display:block;font-size:13px;color:var(--tx);}
+.md-suggest-item span{display:block;font-size:10px;color:var(--tx2);margin-top:1px;}
+.md-card{background:var(--s2);border-radius:14px;padding:16px;text-align:center;}
+.md-place{font-size:13px;color:var(--tx2);margin-bottom:6px;}
+.md-time{font-size:38px;font-weight:800;font-family:'Space Mono',monospace;color:var(--ac3);line-height:1;}
+.md-date{font-size:11px;color:var(--tx2);margin-top:6px;text-transform:capitalize;}
+/* PARTAGER */
+.share-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
+.share-btn{border:none;border-radius:11px;color:#fff;padding:14px 6px;font-size:11px;font-weight:700;cursor:pointer;font-family:'Syne',sans-serif;text-align:center;}
+.share-btn:active{opacity:.75;}
+/* QR CODE */
+.qr-box{background:#fff;border-radius:14px;padding:16px;display:flex;align-items:center;justify-content:center;margin-top:8px;}
+.qr-box img,.qr-box canvas{max-width:100%;height:auto;}
+/* RÉSEAUX SOCIAUX */
+.soc-row{display:flex;justify-content:space-between;align-items:center;background:var(--s2);border-radius:9px;padding:9px 12px;margin-bottom:6px;font-size:11px;}
+.soc-name{color:var(--tx);font-weight:700;}
+.soc-status{font-family:'Space Mono',monospace;font-size:10px;}
+.soc-status.ok{color:var(--gr);}
+.soc-status.bad{color:var(--ac);}
+/* FUSEAUX HORAIRES */
+.fz-row{display:flex;justify-content:space-between;align-items:center;background:var(--s2);border-radius:9px;padding:10px 12px;margin-bottom:6px;}
+.fz-name{font-size:12px;color:var(--tx);}
+.fz-time{font-family:'Space Mono',monospace;font-size:15px;font-weight:700;color:var(--ac3);}
 /* CARD */
 .card{width:100%;max-width:480px;background:var(--s);border-radius:20px;padding:15px;box-shadow:0 20px 60px rgba(0,0,0,.45);border:1px solid rgba(255,255,255,.05);}
 /* TABS */
@@ -205,10 +267,6 @@ input[type=number]{-webkit-appearance:none;appearance:none;}
 .pchk input{accent-color:var(--ac2);width:13px;height:13px;}
 .pchk span{font-size:11px;font-weight:600;}
 .pstr{height:4px;border-radius:2px;margin-bottom:6px;transition:all .3s;}
-/* VITESSE */
-.vm{display:flex;gap:4px;margin-bottom:9px;}
-.vmb{flex:1;padding:7px;border:none;border-radius:8px;background:var(--s2);color:var(--tx2);font-size:10px;font-weight:700;font-family:'Syne',sans-serif;cursor:pointer;transition:all .13s;}
-.vmb.active{background:var(--ac);color:#fff;}
 /* NOTES */
 .note-row{display:flex;gap:5px;margin-bottom:5px;align-items:center;}
 .note-row .inp{flex:1;}
@@ -222,9 +280,6 @@ input[type=number]{-webkit-appearance:none;appearance:none;}
 .et-item:nth-child(odd){background:var(--s2);}
 .et-label{color:var(--tx2);}
 .et-val{font-family:'Space Mono',monospace;font-weight:700;color:var(--gr);}
-/* CARBURANT */
-.fuel-gauge{width:100%;height:18px;border-radius:9px;background:var(--s2);overflow:hidden;margin:8px 0;}
-.fuel-fill{height:100%;border-radius:9px;transition:width .6s ease;background:linear-gradient(90deg,var(--gr),var(--or),var(--ac));}
 /* SURFACE */
 .shape-tabs{display:flex;gap:4px;margin-bottom:9px;flex-wrap:wrap;}
 .stab{padding:5px 10px;border:none;border-radius:7px;background:var(--s2);color:var(--tx2);font-size:10px;font-weight:700;font-family:'Syne',sans-serif;cursor:pointer;transition:all .13s;}
@@ -240,6 +295,7 @@ input[type=number]{-webkit-appearance:none;appearance:none;}
 /* PRINT / EXPORT PDF */
 .print-zone{display:none;}
 @media print{
+  body.printing{background:#fff !important;background-image:none !important;}
   body.printing *{visibility:hidden !important;}
   body.printing .print-zone,body.printing .print-zone *{visibility:visible !important;}
   body.printing .print-zone{display:block !important;position:absolute;top:0;left:0;width:100%;background:#fff;color:#111;padding:24px;font-family:Arial,sans-serif;}
@@ -249,6 +305,11 @@ input[type=number]{-webkit-appearance:none;appearance:none;}
   body.printing .print-zone th,body.printing .print-zone td{border:1px solid #ccc;padding:6px 8px;font-size:12px;text-align:left;}
   body.printing .print-zone th{background:#f0f0f0;}
   body.printing .print-zone .psum p{font-size:13px;margin:4px 0;}
+  body.printing .print-zone .psum-table{width:100%;border-collapse:collapse;margin-bottom:16px;}
+  body.printing .print-zone .psum-table td{border:1px solid #ccc;padding:7px 10px;font-size:13px;}
+  body.printing .print-zone .psum-table td:first-child{font-weight:600;background:#f7f7f7;width:60%;}
+  body.printing .print-zone .psum-table td:last-child{text-align:right;font-family:'Courier New',monospace;}
+  body.printing .print-zone .psum-table tr.tot-row td{background:#eef7f0;font-weight:800;font-size:14px;border-top:2px solid #333;}
   body.printing .print-zone .pfoot{margin-top:20px;font-size:10px;color:#999;}
 }
 </style>
@@ -286,6 +347,7 @@ input[type=number]{-webkit-appearance:none;appearance:none;}
   <div class="logo">Coeurnoh<span>Calculatrice Pro</span></div>
   <div class="hc">
     <button class="install-btn" onclick="openInstallModal()" id="installBtn">📲 Installer</button>
+    <button class="cb" onclick="shareApp()" id="shareBtn" title="Partager">📤</button>
     <button class="cb" onclick="toggleTheme()">☀️</button>
     <button class="cb" onclick="toggleHist()" id="histBtn">📋</button>
   </div>
@@ -309,19 +371,31 @@ input[type=number]{-webkit-appearance:none;appearance:none;}
       <button class="tab" onclick="st('calories')">🥗 Cal.</button>
       <button class="tab" onclick="st('age')">🎂 Âge</button>
       <button class="tab" onclick="st('password')">🔐 MDP</button>
-      <button class="tab" onclick="st('vitesse')">🚗 Vit.</button>
-    </div>
-    <div class="tr">
       <button class="tab" onclick="st('notes')">📝 Notes</button>
-      <button class="tab" onclick="st('epargne')">💎 Épargne</button>
-      <button class="tab" onclick="st('carburant')">⛽ Carbu.</button>
-      <button class="tab" onclick="st('surface')">📐 Surface</button>
     </div>
     <div class="tr">
+      <button class="tab" onclick="st('epargne')">💎 Épargne</button>
+      <button class="tab" onclick="st('surface')">📐 Surface</button>
       <button class="tab" onclick="st('marge')">📈 Marge</button>
       <button class="tab" onclick="st('tva')">🧾 TVA</button>
+    </div>
+    <div class="tr">
       <button class="tab" onclick="st('remise')">🏷️ Remise</button>
       <button class="tab" onclick="st('devis')">📄 Devis</button>
+      <button class="tab" onclick="st('rentabilite')">⚖️ Rentab.</button>
+      <button class="tab" onclick="st('qrcode')">▪️ QR Code</button>
+    </div>
+    <div class="tr">
+      <button class="tab" onclick="st('social')">📱 Réseaux</button>
+      <button class="tab" onclick="st('monde')">🌍 Monde</button>
+      <button class="tab" onclick="st('compta')">📒 Compta</button>
+      <button class="tab" onclick="st('inventaire')">📦 Stock</button>
+    </div>
+    <div class="tr">
+      <button class="tab" onclick="st('excel')">📊 Excel</button>
+      <button class="tab" onclick="st('plancompta')">📚 Plan OHADA</button>
+      <div style="flex:1"></div>
+      <div style="flex:1"></div>
     </div>
   </div>
 
@@ -445,6 +519,7 @@ input[type=number]{-webkit-appearance:none;appearance:none;}
         <div class="rc"><div class="rl">Taux mensuel</div><div class="rv" id="pTm">—</div></div>
         <div class="rc"><div class="rl">Nb mensualités</div><div class="rv" id="pNb">—</div></div>
       </div>
+      <button class="abt" style="margin-top:10px;background:linear-gradient(135deg,var(--ac3),var(--gr));" onclick="exportPretPDF()">📄 Exporter le reçu en PDF</button>
     </div>
   </div>
 
@@ -616,28 +691,6 @@ input[type=number]{-webkit-appearance:none;appearance:none;}
     <button class="abt" onclick="genPwd()">🔄 Générer un nouveau</button>
   </div>
 
-  <!-- ===== VITESSE ===== -->
-  <div id="panelVitesse" style="display:none">
-    <div class="vm">
-      <button class="vmb active" onclick="setVM('v')">🚀 Vitesse</button>
-      <button class="vmb" onclick="setVM('d')">📍 Distance</button>
-      <button class="vmb" onclick="setVM('t')">🕐 Temps</button>
-    </div>
-    <div id="vDistW"><div class="fg"><div class="lb">Distance</div><div class="fl"><input class="inp" id="vDist" type="number" placeholder="Ex: 100" style="flex:1"><select class="sel" id="vDU" style="width:75px"><option>km</option><option>m</option><option>mile</option></select></div></div></div>
-    <div id="vTimeW"><div class="fg"><div class="lb">Temps</div><div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px;"><div><div class="lb">h</div><input class="inp" id="vH" type="number" value="0" min="0"></div><div><div class="lb">min</div><input class="inp" id="vMin" type="number" value="0" min="0" max="59"></div><div><div class="lb">sec</div><input class="inp" id="vSec" type="number" value="0" min="0" max="59"></div></div></div></div>
-    <div id="vSpdW"><div class="fg"><div class="lb">Vitesse</div><div class="fl"><input class="inp" id="vSpd" type="number" placeholder="Ex: 80" style="flex:1"><select class="sel" id="vSU" style="width:85px"><option>km/h</option><option>m/s</option><option>mph</option></select></div></div></div>
-    <button class="abt" onclick="calcVit()">⚡ Calculer</button>
-    <div id="vitR" style="display:none">
-      <div class="rg">
-        <div class="rc full hero"><div class="rl" id="vRL">Résultat</div><div class="rv" id="vRV">—</div></div>
-        <div class="rc"><div class="rl">km/h</div><div class="rv" id="vKmh">—</div></div>
-        <div class="rc"><div class="rl">m/s</div><div class="rv" id="vMs">—</div></div>
-        <div class="rc"><div class="rl">mph</div><div class="rv" id="vMph">—</div></div>
-        <div class="rc"><div class="rl">Nœuds</div><div class="rv" id="vKn">—</div></div>
-      </div>
-    </div>
-  </div>
-
   <!-- ===== NOTES SCOLAIRES ===== -->
   <div id="panelNotes" style="display:none">
     <div class="lb" style="margin-bottom:6px;">Entrez le nom du cours, le point maximum et le point obtenu</div>
@@ -682,37 +735,86 @@ input[type=number]{-webkit-appearance:none;appearance:none;}
     </div>
   </div>
 
-  <!-- ===== CARBURANT ===== -->
-  <div id="panelCarburant" style="display:none">
+  <!-- ===== SEUIL DE RENTABILITÉ ===== -->
+  <div id="panelRentabilite" style="display:none">
+    <div class="lb" style="margin-bottom:6px;">Combien d'unités vendre pour rentabiliser vos charges ?</div>
+    <div class="fg"><div class="lb">Charges fixes (mensuelles : loyer, abonnements, salaires…)</div><input class="inp" id="rbFixe" type="number" placeholder="Ex: 300" oninput="calcRentab()"></div>
+    <div class="fg"><div class="lb">Prix de vente unitaire</div><input class="inp" id="rbPv" type="number" placeholder="Ex: 15" oninput="calcRentab()"></div>
+    <div class="fg"><div class="lb">Coût variable unitaire (matière, livraison…)</div><input class="inp" id="rbCv" type="number" placeholder="Ex: 5" oninput="calcRentab()"></div>
+    <div id="rentabR" style="display:none">
+      <div class="rg">
+        <div class="rc full hero"><div class="rl">Unités à vendre pour rentabiliser</div><div class="rv" id="rbUnites">—</div></div>
+        <div class="rc"><div class="rl">Chiffre d'affaires au seuil</div><div class="rv" id="rbCA">—</div></div>
+        <div class="rc"><div class="rl">Marge sur coût variable / unité</div><div class="rv" id="rbMarge">—</div></div>
+        <div class="rc"><div class="rl">Taux de marge</div><div class="rv" id="rbTaux">—</div></div>
+      </div>
+      <div class="rate-note">💡 Au-delà de ce seuil, chaque vente supplémentaire devient du bénéfice net.</div>
+    </div>
+    <div id="rentabErr" style="display:none" class="rate-note">⚠️ Le prix de vente doit être supérieur au coût variable pour pouvoir rentabiliser.</div>
+  </div>
+
+  <!-- ===== QR CODE ===== -->
+  <div id="panelQrcode" style="display:none">
     <div class="chtabs">
-      <button class="chtab active" onclick="setFuelMode('conso')">⛽ Consommation</button>
-      <button class="chtab" onclick="setFuelMode('cout')">💰 Coût trajet</button>
+      <button class="chtab active" onclick="setQrMode('lien')">🔗 Texte / Lien</button>
+      <button class="chtab" onclick="setQrMode('wa')">💬 Numéro WhatsApp</button>
     </div>
-    <div id="fuelConso">
-      <div class="fg"><div class="lb">Distance parcourue (km)</div><input class="inp" id="fDist" type="number" placeholder="Ex: 450" oninput="calcFuel()"></div>
-      <div class="fg"><div class="lb">Carburant utilisé (litres)</div><input class="inp" id="fLit" type="number" placeholder="Ex: 38" oninput="calcFuel()"></div>
-      <div id="fuelConsoR" style="display:none">
-        <div class="fuel-gauge"><div class="fuel-fill" id="fuelBar" style="width:0%"></div></div>
-        <div class="rg">
-          <div class="rc full hero"><div class="rl">Consommation</div><div class="rv" id="fConso">—</div></div>
-          <div class="rc"><div class="rl">km par litre</div><div class="rv" id="fKpl">—</div></div>
-          <div class="rc"><div class="rl">Catégorie</div><div class="rv" id="fCat">—</div></div>
-        </div>
-      </div>
+    <div id="qrLienW">
+      <div class="fg"><div class="lb">Texte, lien, ou info de paiement</div><input class="inp" id="qrTxt" type="text" placeholder="Ex: https://coeurnohb-collab.github.io/coeurnoh-pro/" oninput="qrAutoClear()"></div>
     </div>
-    <div id="fuelCout" style="display:none">
-      <div class="fg"><div class="lb">Distance du trajet (km)</div><input class="inp" id="fDist2" type="number" placeholder="Ex: 300"></div>
-      <div class="fg"><div class="lb">Consommation (L/100km)</div><input class="inp" id="fCons2" type="number" placeholder="Ex: 7.5" step="0.1"></div>
-      <div class="fg"><div class="lb">Prix du carburant (/litre)</div><input class="inp" id="fPrix" type="number" placeholder="Ex: 1.85" step="0.01"></div>
-      <button class="abt" onclick="calcCout()">💰 Calculer le coût</button>
-      <div id="fuelCoutR" style="display:none">
-        <div class="rg">
-          <div class="rc full hero"><div class="rl">Coût total du trajet</div><div class="rv" id="fTot">—</div></div>
-          <div class="rc"><div class="rl">Litres nécessaires</div><div class="rv" id="fLitNec">—</div></div>
-          <div class="rc"><div class="rl">Coût / 100km</div><div class="rv" id="fC100">—</div></div>
-          <div class="rc"><div class="rl">Aller-retour</div><div class="rv" id="fAR">—</div></div>
-        </div>
+    <div id="qrWaW" style="display:none">
+      <div class="fg"><div class="lb">Numéro WhatsApp (avec indicatif pays)</div><input class="inp" id="qrWaNum" type="text" placeholder="Ex: +243900000000" oninput="qrAutoClear()"></div>
+      <div class="fg"><div class="lb">Message pré-rempli (optionnel)</div><input class="inp" id="qrWaMsg" type="text" placeholder="Ex: Bonjour, je suis intéressé par vos services" oninput="qrAutoClear()"></div>
+    </div>
+    <button class="abt" onclick="genQR()">▪️ Générer le QR Code</button>
+    <div id="qrResult" style="display:none">
+      <div class="qr-box"><div id="qrCanvasHolder"></div></div>
+      <div class="rate-note" id="qrContentPreview" style="word-break:break-all;">—</div>
+      <button class="abt" style="margin-top:10px;background:linear-gradient(135deg,var(--ac3),var(--gr));" onclick="downloadQR()">📥 Télécharger l'image PNG</button>
+    </div>
+  </div>
+
+  <!-- ===== RÉSEAUX SOCIAUX ===== -->
+  <div id="panelSocial" style="display:none">
+    <div class="lb" style="margin-bottom:6px;">Écrivez ou collez votre texte pour vérifier les limites</div>
+    <textarea class="inp" id="socTxt" rows="5" style="resize:vertical;font-family:inherit;" placeholder="Écrivez votre légende, bio ou post ici…" oninput="calcSocial()"></textarea>
+    <div class="rg" style="margin-top:10px;margin-bottom:4px;">
+      <div class="rc"><div class="rl">Caractères</div><div class="rv" id="socChars">0</div></div>
+      <div class="rc"><div class="rl">Mots</div><div class="rv" id="socWords">0</div></div>
+    </div>
+    <div class="lb" style="margin:10px 0 6px;">Compatibilité par plateforme</div>
+    <div id="socList"></div>
+  </div>
+
+  <!-- ===== MONDE : HEURE + MÉTÉO PAR VILLE ===== -->
+  <div id="panelMonde" style="display:none">
+    <div class="lb" style="margin-bottom:6px;">Tapez le nom d'un pays ou d'une ville, puis appuyez sur Rechercher</div>
+    <div class="fg">
+      <input class="inp" id="mdQuery" type="text" placeholder="Ex: Kinshasa, Paris, Dubaï…" autocomplete="off" inputmode="search" onkeydown="if(event.key==='Enter'){event.preventDefault();mdSearch(document.getElementById('mdQuery').value.trim());}">
+    </div>
+    <button class="abt" onclick="mdSearch(document.getElementById('mdQuery').value.trim())">🔍 Rechercher</button>
+    <div class="lb" style="margin:12px 0 6px;">Ou choisissez une ville rapide :</div>
+    <div class="tgrid">
+      <button class="tb" onclick="mdQuickSearch('Kinshasa')">🇨🇩 Kinshasa</button>
+      <button class="tb" onclick="mdQuickSearch('Lubumbashi')">🇨🇩 Lubumbashi</button>
+      <button class="tb" onclick="mdQuickSearch('Paris')">🇫🇷 Paris</button>
+      <button class="tb" onclick="mdQuickSearch('New York')">🇺🇸 New York</button>
+    </div>
+    <div id="mdLoading" style="display:none" class="rate-note">⏳ Recherche en cours…</div>
+    <div id="mdErr" style="display:none" class="rate-note">⚠️ Ville introuvable, pas de connexion internet, ou l'app n'est pas encore ouverte via son lien en ligne. Vérifiez l'orthographe ou votre réseau.</div>
+    <div id="mdSuggest" class="md-suggest" style="display:none"></div>
+    <div id="mdResult" style="display:none">
+      <div class="md-card">
+        <div class="md-place" id="mdPlace">—</div>
+        <div class="md-time" id="mdTime">—</div>
+        <div class="md-date" id="mdDate">—</div>
       </div>
+      <div class="rg" style="margin-top:10px;">
+        <div class="rc full hero"><div class="rl" id="mdWxLbl">Météo actuelle</div><div class="rv" id="mdTemp">—</div></div>
+        <div class="rc"><div class="rl">Humidité</div><div class="rv" id="mdHum">—</div></div>
+        <div class="rc"><div class="rl">Vent</div><div class="rv" id="mdWind">—</div></div>
+      </div>
+      <div class="rate-note" id="mdAttrib">Source : Open-Meteo</div>
     </div>
   </div>
 
@@ -836,6 +938,115 @@ input[type=number]{-webkit-appearance:none;appearance:none;}
     </div>
   </div>
 
+  <!-- ===== COMPTABILITÉ : JOURNAL / GRAND LIVRE + BILAN ===== -->
+  <div id="panelCompta" style="display:none">
+    <div class="chtabs">
+      <button class="chtab active" onclick="setCptMode('journal')">📒 Journal</button>
+      <button class="chtab" onclick="setCptMode('bilan')">⚖️ Bilan</button>
+    </div>
+
+    <div id="cptJournalW">
+      <div class="cpt-head"><span>Libellé</span><span>Débit</span><span>Crédit</span><span></span></div>
+      <div id="cptList"></div>
+      <button class="add-note-btn" onclick="addCptRow()">+ Ajouter une écriture</button>
+      <button class="abt" onclick="calcCompta()">🧮 Calculer le solde</button>
+      <div id="cptR" style="display:none">
+        <div class="dev-totals">
+          <div class="dev-trow"><span>Total Débit</span><b id="cptDebit">—</b></div>
+          <div class="dev-trow"><span>Total Crédit</span><b id="cptCredit">—</b></div>
+          <div class="dev-trow tot"><span id="cptSoldeLbl">Solde</span><b id="cptSolde">—</b></div>
+        </div>
+        <button class="abt" style="margin-top:10px;background:linear-gradient(135deg,var(--ac3),var(--gr));" onclick="exportComptaPDF()">📄 Exporter le journal en PDF</button>
+      </div>
+    </div>
+
+    <div id="cptBilanW" style="display:none">
+      <div class="bil-section">
+        <div class="bil-title">Actif (ce que possède l'entreprise)</div>
+        <div id="bilActifList"></div>
+        <button class="add-note-btn" onclick="addBilRow('actif')">+ Ajouter un poste d'actif</button>
+      </div>
+      <div class="bil-section">
+        <div class="bil-title">Passif (dettes &amp; capitaux propres)</div>
+        <div id="bilPassifList"></div>
+        <button class="add-note-btn" onclick="addBilRow('passif')">+ Ajouter un poste de passif</button>
+      </div>
+      <button class="abt" onclick="calcBilan()">⚖️ Vérifier l'équilibre</button>
+      <div id="bilR" style="display:none">
+        <div class="rg">
+          <div class="rc"><div class="rl">Total Actif</div><div class="rv" id="bilActifTot">—</div></div>
+          <div class="rc"><div class="rl">Total Passif</div><div class="rv" id="bilPassifTot">—</div></div>
+        </div>
+        <div class="bil-status" id="bilStatus">—</div>
+        <button class="abt" style="margin-top:10px;background:linear-gradient(135deg,var(--ac3),var(--gr));" onclick="exportBilanPDF()">📄 Exporter le bilan en PDF</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== INVENTAIRE / STOCK ===== -->
+  <div id="panelInventaire" style="display:none">
+    <div class="lb" style="margin-bottom:6px;">Articles en stock</div>
+    <div class="inv-grid-lbl"><span>Qté</span><span>Prix achat</span><span>Prix vente</span><span>Valeur</span><span></span></div>
+    <div id="invList"></div>
+    <button class="add-note-btn" onclick="addInvRow()">+ Ajouter un article</button>
+    <button class="abt" onclick="calcInventaire()">📦 Calculer la valeur du stock</button>
+    <div id="invR" style="display:none">
+      <div class="dev-totals">
+        <div class="dev-trow"><span>Nombre d'articles (unités)</span><b id="invNb">—</b></div>
+        <div class="dev-trow"><span>Valeur du stock (prix d'achat)</span><b id="invValAchat">—</b></div>
+        <div class="dev-trow"><span>Valeur potentielle (prix de vente)</span><b id="invValVente">—</b></div>
+        <div class="dev-trow tot"><span>Marge potentielle totale</span><b id="invMarge">—</b></div>
+      </div>
+      <button class="abt" style="margin-top:10px;background:linear-gradient(135deg,var(--ac3),var(--gr));" onclick="exportInventairePDF()">📄 Exporter l'inventaire en PDF</button>
+    </div>
+  </div>
+
+  <!-- ===== TABLEAU EXCEL ===== -->
+  <div id="panelExcel" style="display:none">
+    <div class="lb" style="margin-bottom:6px;">Tableau de calcul libre — comme un mini-Excel</div>
+    <div class="cpt-head"><span>Libellé</span><span>Valeur</span><span></span></div>
+    <div id="excList"></div>
+    <button class="add-note-btn" onclick="addExcRow()">+ Ajouter une ligne</button>
+    <button class="abt" onclick="calcExcel()">📊 Calculer</button>
+    <div id="excR" style="display:none">
+      <div class="dev-totals">
+        <div class="dev-trow"><span>Nombre de lignes</span><b id="excNb">—</b></div>
+        <div class="dev-trow"><span>Somme totale</span><b id="excSum">—</b></div>
+        <div class="dev-trow"><span>Moyenne</span><b id="excAvg">—</b></div>
+        <div class="dev-trow"><span>Maximum</span><b id="excMax">—</b></div>
+        <div class="dev-trow tot"><span>Minimum</span><b id="excMin">—</b></div>
+      </div>
+      <button class="abt" style="margin-top:10px;background:linear-gradient(135deg,var(--ac3),var(--gr));" onclick="exportExcelPDF()">📄 Exporter en PDF</button>
+      <button class="abt" style="margin-top:8px;background:linear-gradient(135deg,#1d6f42,#3aa85c);" onclick="exportExcelCSV()">📊 Exporter en fichier Excel (CSV)</button>
+    </div>
+  </div>
+
+  <!-- ===== PLAN COMPTABLE OHADA ===== -->
+  <div id="panelPlancompta" style="display:none">
+    <div class="lb" style="margin-bottom:6px;">Plan comptable général SYSCOHADA — comptes principaux</div>
+    <div class="fg"><input class="inp" id="pcSearch" type="text" placeholder="Rechercher un compte ou un mot-clé…" oninput="renderPlanCompta()"></div>
+    <div class="tgrid" id="pcClassFilter">
+      <button class="tb active" data-c="all" onclick="setPcClass('all')">Toutes</button>
+      <button class="tb" data-c="1" onclick="setPcClass('1')">Classe 1</button>
+      <button class="tb" data-c="2" onclick="setPcClass('2')">Classe 2</button>
+      <button class="tb" data-c="3" onclick="setPcClass('3')">Classe 3</button>
+    </div>
+    <div class="tgrid" style="margin-top:6px;">
+      <button class="tb" data-c="4" onclick="setPcClass('4')">Classe 4</button>
+      <button class="tb" data-c="5" onclick="setPcClass('5')">Classe 5</button>
+      <button class="tb" data-c="6" onclick="setPcClass('6')">Classe 6</button>
+      <button class="tb" data-c="7" onclick="setPcClass('7')">Classe 7</button>
+    </div>
+    <div class="tgrid" style="margin-top:6px;">
+      <button class="tb" data-c="8" onclick="setPcClass('8')">Classe 8</button>
+      <div style="flex:1"></div><div style="flex:1"></div><div style="flex:1"></div>
+    </div>
+    <div id="pcCount" class="rate-note" style="margin-top:10px;">—</div>
+    <div id="pcList" style="margin-top:6px;"></div>
+    <button class="abt" style="margin-top:10px;background:linear-gradient(135deg,var(--ac3),var(--gr));" onclick="exportPlanComptaPDF()">📄 Exporter ce plan en PDF</button>
+    <div class="rate-note">ℹ️ Liste des comptes principaux (niveau classe/poste) du système comptable OHADA, à titre de référence rapide. Pour un compte très spécifique, vérifiez l'Acte uniforme officiel ou votre expert-comptable.</div>
+  </div>
+
 </div><!-- card -->
 
 <script>
@@ -843,7 +1054,7 @@ input[type=number]{-webkit-appearance:none;appearance:none;}
 // STATE
 // ============================================================
 let expr='',curPos=0,isNew=true,history=[],histOpen=false,soundOn=true,curTab='calc';
-let convType='monnaie',tipPct=10,vitMode='v',fuelMode='conso',shapeType='rect';
+let convType='monnaie',tipPct=10,shapeType='rect';
 let liveRates={EUR:1,USD:1.08,GBP:0.855,CDF:2880,MAD:10.8,XOF:655.96,NGN:1680,ZAR:20.1,CNY:7.82,JPY:164,CAD:1.47,AUD:1.65,CHF:0.97,INR:89.5,BRL:6.35,ZMW:27.8,RWF:1420,UGX:4050,TZS:2720,BIF:3070,AOA:893,SSP:1420,SDG:650};
 const DAYS=['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
 const MONTHS=['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
@@ -855,8 +1066,70 @@ const ZODIAC=[{s:'Capricorne',e:[1,19]},{s:'Verseau',e:[2,18]},{s:'Poissons',e:[
 function safeLS_get(k){try{return localStorage.getItem(k);}catch(e){return null;}}
 function safeLS_set(k,v){try{localStorage.setItem(k,v);return true;}catch(e){return false;}}
 
+// ============================================================
+// PERSISTANCE LOCALE ("base de données" sur l'appareil)
+// Sauvegarde automatiquement Notes, Devis, Compta, Bilan, Stock, Excel
+// pour qu'aucune donnée ne soit perdue en revenant dans l'app.
+// ============================================================
+const PERSIST_TARGETS={
+  notesList:{addFn:()=>addNoteRow(),calcFn:()=>calcNotes()},
+  devisList:{addFn:()=>addDevRow(),calcFn:()=>calcDevis(),fields:['dvEnt','dvClient','dvNum','dvDevise','dvTva']},
+  cptList:{addFn:()=>addCptRow(),calcFn:()=>calcCompta()},
+  bilActifList:{addFn:()=>addBilRow('actif'),calcFn:()=>calcBilan()},
+  bilPassifList:{addFn:()=>addBilRow('passif'),calcFn:()=>calcBilan()},
+  invList:{addFn:()=>addInvRow(),calcFn:()=>calcInventaire()},
+  excList:{addFn:()=>addExcRow(),calcFn:()=>calcExcel()}
+};
+function saveRowsOf(key){
+  const container=document.getElementById(key);if(!container)return;
+  const data=Array.from(container.children).map(row=>Array.from(row.querySelectorAll('input')).map(i=>i.value));
+  safeLS_set('cnr_rows_'+key,JSON.stringify(data));
+  const cfg=PERSIST_TARGETS[key];
+  if(cfg&&cfg.fields){
+    const f={};cfg.fields.forEach(id=>{const el=document.getElementById(id);if(el)f[id]=el.value;});
+    safeLS_set('cnr_fields_'+key,JSON.stringify(f));
+  }
+}
+function restoreContainer(key){
+  const cfg=PERSIST_TARGETS[key];if(!cfg)return false;
+  if(cfg.fields){
+    const fv=safeLS_get('cnr_fields_'+key);
+    if(fv){try{const f=JSON.parse(fv);cfg.fields.forEach(id=>{if(f[id]!==undefined){const el=document.getElementById(id);if(el)el.value=f[id];}});}catch(e){}}
+  }
+  const rv=safeLS_get('cnr_rows_'+key);
+  if(!rv)return false;
+  let rows;try{rows=JSON.parse(rv);}catch(e){return false;}
+  if(!rows||!rows.length)return false;
+  const container=document.getElementById(key);
+  rows.forEach(rowVals=>{
+    cfg.addFn();
+    const lastRow=container.lastElementChild;
+    const inputs=lastRow.querySelectorAll('input');
+    rowVals.forEach((v,i)=>{if(inputs[i])inputs[i].value=v;});
+  });
+  if(cfg.calcFn){try{cfg.calcFn();}catch(e){}}
+  return true;
+}
+let _persistDebounce={};
+document.addEventListener('input',e=>{
+  let el=e.target,key=null;
+  while(el&&el!==document.body){
+    if(el.id&&PERSIST_TARGETS[el.id]){key=el.id;break;}
+    el=el.parentElement;
+  }
+  if(!key&&PERSIST_TARGETS.devisList.fields.includes(e.target.id))key='devisList';
+  if(!key)return;
+  clearTimeout(_persistDebounce[key]);
+  _persistDebounce[key]=setTimeout(()=>saveRowsOf(key),700);
+});
+document.addEventListener('click',e=>{
+  if(e.target.classList&&e.target.classList.contains('note-del')){
+    setTimeout(()=>{Object.keys(PERSIST_TARGETS).forEach(saveRowsOf);},50);
+  }
+});
+
 const RATE_SOURCES=[
-  {name:'Frankfurter',url:'https://api.frankfurter.dev/v1/latest?base=EUR',parse:d=>d.rates},
+  {name:'Frankfurter',url:'https://api.frankfurter.dev/v2/rates?base=EUR',parse:d=>d.rates},
   {name:'Open ER-API',url:'https://open.er-api.com/v6/latest/EUR',parse:d=>d.result==='success'?d.rates:null},
   {name:'ExchangeRate-API',url:'https://api.exchangerate-api.com/v4/latest/EUR',parse:d=>d.rates}
 ];
@@ -1096,7 +1369,7 @@ function fallbackCopy(text){
 }
 // RIPPLE
 document.addEventListener('click',e=>{
-  const b=e.target.closest('.btn,.chbtn,.abt,.vmb,.tb,.chtab,.cbtn,.stab,.cc');
+  const b=e.target.closest('.btn,.chbtn,.abt,.tb,.chtab,.cbtn,.stab,.cc');
   if(!b)return;
   const r=document.createElement('span');r.className='ripple';
   const rect=b.getBoundingClientRect(),s=Math.max(rect.width,rect.height);
@@ -1112,7 +1385,7 @@ function toggleTheme(){document.body.classList.toggle('light');pk(660,'sine',.08
 // ============================================================
 // TABS
 // ============================================================
-const ALL=['calc','sci','conv','pret','imc','couleur','pourboire','chrono','calories','age','password','vitesse','notes','epargne','carburant','surface','marge','tva','remise','devis'];
+const ALL=['calc','sci','conv','pret','imc','couleur','pourboire','chrono','calories','age','password','notes','epargne','surface','marge','tva','remise','devis','rentabilite','qrcode','social','monde','compta','inventaire','excel','plancompta'];
 function st(tab){
   curTab=tab;
   ALL.forEach(t=>{const p=document.getElementById('panel'+t.charAt(0).toUpperCase()+t.slice(1));if(p)p.style.display=t===tab?'block':'none';});
@@ -1129,8 +1402,14 @@ function st(tab){
   if(tab==='age'){const t=new Date();document.getElementById('aRef').value=pad2(t.getDate())+'/'+pad2(t.getMonth()+1)+'/'+t.getFullYear();}
   if(tab==='password')genPwd();
   if(tab==='surface')setShape('rect');
-  if(tab==='notes'&&document.getElementById('notesList').children.length===0){addNoteRow();addNoteRow();addNoteRow();}
-  if(tab==='devis'&&document.getElementById('devisList').children.length===0){addDevRow();addDevRow();}
+  if(tab==='notes'&&document.getElementById('notesList').children.length===0){if(!restoreContainer('notesList')){addNoteRow();addNoteRow();addNoteRow();}}
+  if(tab==='devis'&&document.getElementById('devisList').children.length===0){if(!restoreContainer('devisList')){addDevRow();addDevRow();}}
+  if(tab==='social')calcSocial();
+  if(tab==='compta'&&document.getElementById('cptList').children.length===0){if(!restoreContainer('cptList')){addCptRow();addCptRow();}}
+  if(tab==='compta'&&document.getElementById('bilActifList').children.length===0){if(!restoreContainer('bilActifList')){addBilRow('actif');addBilRow('actif');}if(!restoreContainer('bilPassifList')){addBilRow('passif');addBilRow('passif');}}
+  if(tab==='inventaire'&&document.getElementById('invList').children.length===0){if(!restoreContainer('invList')){addInvRow();addInvRow();}}
+  if(tab==='excel'&&document.getElementById('excList').children.length===0){if(!restoreContainer('excList')){addExcRow();addExcRow();addExcRow();}}
+  if(tab==='plancompta')renderPlanCompta();
   pk(550,'sine',.06);
 }
 
@@ -1233,7 +1512,21 @@ function calcPret(){
   document.getElementById('pInt').textContent=interets.toFixed(2);
   document.getElementById('pTm').textContent=(parseFloat(document.getElementById('pT').value)/12).toFixed(4)+'%';
   document.getElementById('pNb').textContent=n+' mensualités';
+  window._lastPret={P,taux:parseFloat(document.getElementById('pT').value),n,m,total,interets};
   document.getElementById('pretR').style.display='block';pkCalc();
+}
+function exportPretPDF(){
+  const d=window._lastPret;if(!d)return;
+  buildPdf('Reçu de simulation de prêt','Cœurnohrad — '+pdfNowDate(),[
+    {type:'summary',pairs:[
+      ['Montant emprunté',d.P.toFixed(2)],
+      ['Taux annuel',d.taux+'%'],
+      ['Durée',d.n+' mensualités'],
+      ['Mensualité',d.m.toFixed(2)+' / mois'],
+      ['Total remboursé',d.total.toFixed(2)],
+      ['Coût total des intérêts',d.interets.toFixed(2),true]
+    ]}
+  ],'coeurnoh-pret.pdf');
 }
 
 // IMC
@@ -1283,6 +1576,88 @@ let chRun=false,chStart_=0,chElap=0,chInt=null,laps=[];
 let tiRun=false,tiRem=0,tiInt=null;
 function setChM(m){document.querySelectorAll('.chtab').forEach((el,i)=>el.classList.toggle('active',['chrono','timer'][i]===m));document.getElementById('chMode').style.display=m==='chrono'?'block':'none';document.getElementById('tiMode').style.display=m==='timer'?'block':'none';}
 function pad2(n){return String(Math.floor(n)).padStart(2,'0');}
+
+// ============================================================
+// PDF — génération de vrais fichiers PDF (jsPDF + autoTable)
+// Plus fiable que window.print() : ne dépend pas du système
+// d'impression du téléphone, qui échoue sur certains Android.
+// ============================================================
+function pdfReady(){
+  return typeof window.jspdf!=='undefined' && typeof window.jspdf.jsPDF==='function';
+}
+function pdfFail(){
+  alert("⚠️ Le générateur de PDF n'a pas pu se charger.\n\nVérifiez votre connexion internet (cette fonction a besoin d'internet la première fois), puis réessayez. Si le problème persiste, rechargez la page.");
+}
+/**
+ * sections: tableau d'objets, chacun étant :
+ *   {type:'table', head:[...], body:[[...],[...]]}
+ *   {type:'summary', pairs:[[label,valeur,estTotal?], ...]}
+ *   {type:'label', text:'...'}
+ */
+function buildPdf(title,subtitle,sections,filename){
+  if(!pdfReady()){pdfFail();return;}
+  try{
+    const {jsPDF}=window.jspdf;
+    const doc=new jsPDF({unit:'pt',format:'a4'});
+    const marginL=40,marginR=40;
+    let y=54;
+    doc.setFont('helvetica','bold');doc.setFontSize(17);doc.setTextColor(20,20,30);
+    doc.text(title,marginL,y);
+    y+=18;
+    doc.setFont('helvetica','normal');doc.setFontSize(9.5);doc.setTextColor(130,130,140);
+    doc.text(subtitle,marginL,y);
+    doc.setTextColor(0,0,0);
+    y+=18;
+    (sections||[]).forEach(sec=>{
+      const pageH=doc.internal.pageSize.getHeight();
+      if(y>pageH-80){doc.addPage();y=50;}
+      if(sec.type==='label'){
+        doc.setFont('helvetica','bold');doc.setFontSize(11);doc.setTextColor(20,20,30);
+        doc.text(sec.text,marginL,y);
+        doc.setTextColor(0,0,0);
+        y+=14;
+      }else if(sec.type==='table'){
+        doc.autoTable({
+          startY:y,head:[sec.head],body:sec.body,
+          styles:{fontSize:9,cellPadding:5,textColor:[30,30,30]},
+          headStyles:{fillColor:[30,28,40],textColor:255,fontStyle:'bold'},
+          alternateRowStyles:{fillColor:[246,246,249]},
+          margin:{left:marginL,right:marginR}
+        });
+        y=doc.lastAutoTable.finalY+16;
+      }else if(sec.type==='summary'){
+        doc.autoTable({
+          startY:y,
+          body:sec.pairs.map(p=>[p[0],p[1]]),
+          styles:{fontSize:10,cellPadding:7},
+          columnStyles:{0:{fontStyle:'bold',fillColor:[247,247,249],textColor:[60,60,70]},1:{halign:'right',font:'courier',textColor:[20,20,30]}},
+          margin:{left:marginL,right:marginR},
+          theme:'grid',
+          didParseCell:function(data){
+            const row=sec.pairs[data.row.index];
+            if(row&&row[2]){
+              data.cell.styles.fillColor=[224,245,234];
+              data.cell.styles.fontStyle='bold';
+              data.cell.styles.fontSize=11.5;
+            }
+          }
+        });
+        y=doc.lastAutoTable.finalY+16;
+      }
+    });
+    const pageH=doc.internal.pageSize.getHeight();
+    doc.setFontSize(8);doc.setTextColor(160,160,170);
+    doc.text('Document généré via Coeurnoh Pro',marginL,Math.min(y+6,pageH-24));
+    doc.save(filename);
+    pkCalc();
+  }catch(e){
+    alert("⚠️ Une erreur est survenue pendant la génération du PDF. Réessayez, ou vérifiez votre connexion internet.");
+  }
+}
+function pdfNowDate(){
+  const now=new Date();
+  return pad2(now.getDate())+'/'+pad2(now.getMonth()+1)+'/'+now.getFullYear()+' à '+pad2(now.getHours())+':'+pad2(now.getMinutes());
+}
 function fmtCh(ms){const h=Math.floor(ms/3600000),m=Math.floor((ms%3600000)/60000),s=Math.floor((ms%60000)/1000),cs=Math.floor((ms%1000)/10);const base=h>0?`${pad2(h)}:${pad2(m)}:${pad2(s)}`:`${pad2(m)}:${pad2(s)}`;return{base,cs:pad2(cs)};}
 function chTick(){chElap=Date.now()-chStart_;const{base,cs}=fmtCh(chElap);document.getElementById('chDisp').innerHTML=base+'<span class="cms">.'+cs+'</span>';document.getElementById('chDisp').className='cdsp run';}
 function chStart(){if(chRun){chRun=false;clearInterval(chInt);document.getElementById('chSBtn').textContent='▶ Start';document.getElementById('chDisp').className='cdsp pau';}else{chRun=true;chStart_=Date.now()-chElap;chInt=setInterval(chTick,30);document.getElementById('chSBtn').textContent='⏸ Stop';}}
@@ -1365,21 +1740,6 @@ function genPwd(){
 }
 function copyPwd(){const pwd=document.getElementById('pdsp').textContent;if(pwd==='Cliquer pour générer…'){genPwd();return;}copyToClipboard(pwd).then(()=>{document.getElementById('pHint').textContent='✅ Copié dans le presse-papiers !';setTimeout(()=>document.getElementById('pHint').textContent='👆 Cliquer pour copier',2000);});pkCalc();}
 
-// VITESSE
-function setVM(m){vitMode=m;document.querySelectorAll('.vmb').forEach((el,i)=>el.classList.toggle('active',['v','d','t'][i]===m));document.getElementById('vDistW').style.display=m==='d'?'none':'block';document.getElementById('vTimeW').style.display=m==='t'?'none':'block';document.getElementById('vSpdW').style.display=m==='v'?'none':'block';document.getElementById('vitR').style.display='none';}
-function calcVit(){
-  const distRaw=parseFloat(document.getElementById('vDist').value)||0,dU=document.getElementById('vDU').value;
-  const hh=parseFloat(document.getElementById('vH').value)||0,mm=parseFloat(document.getElementById('vMin').value)||0,ss=parseFloat(document.getElementById('vSec').value)||0;
-  const spdRaw=parseFloat(document.getElementById('vSpd').value)||0,sU=document.getElementById('vSU').value;
-  const distKm=dU==='km'?distRaw:dU==='m'?distRaw/1000:distRaw*1.60934;
-  const timeH=hh+mm/60+ss/3600;
-  const spdKmh=sU==='km/h'?spdRaw:sU==='m/s'?spdRaw*3.6:spdRaw*1.60934;
-  const set=(lbl,val,km,ms,mph,kn)=>{document.getElementById('vRL').textContent=lbl;document.getElementById('vRV').textContent=val;document.getElementById('vKmh').textContent=km;document.getElementById('vMs').textContent=ms;document.getElementById('vMph').textContent=mph;document.getElementById('vKn').textContent=kn;document.getElementById('vitR').style.display='block';pkCalc();};
-  if(vitMode==='v'){if(!distKm||!timeH)return;const v=distKm/timeH;set('Vitesse moyenne',v.toFixed(3)+' km/h',v.toFixed(3)+' km/h',(v/3.6).toFixed(3)+' m/s',(v/1.60934).toFixed(3)+' mph',(v/1.852).toFixed(3)+' nœuds');}
-  else if(vitMode==='d'){if(!spdKmh||!timeH)return;const d=spdKmh*timeH;set('Distance',d.toFixed(3)+' km',d.toFixed(3)+' km',(d*1000).toFixed(0)+' m',(d/1.60934).toFixed(3)+' mi',(d/1.852).toFixed(3)+' nœuds');}
-  else{if(!distKm||!spdKmh)return;const t=distKm/spdKmh;const th=Math.floor(t),tm=Math.floor((t-th)*60),ts=Math.round(((t-th)*60-tm)*60);set('Temps',`${pad2(th)}h ${pad2(tm)}m ${pad2(ts)}s`,spdKmh.toFixed(2)+' km/h',(spdKmh/3.6).toFixed(3)+' m/s',(spdKmh/1.60934).toFixed(3)+' mph',(spdKmh/1.852).toFixed(3)+' nœuds');}
-}
-
 // ============================================================
 // NOTES SCOLAIRES (système : cours / point max / point obtenu)
 // ============================================================
@@ -1451,27 +1811,17 @@ function calcNotes(){
 function exportNotesPDF(){
   const d=window._lastNotesDetail,s=window._lastNotesStats;
   if(!d||!s)return;
-  let rows='';
-  for(let i=0;i<d.length;i++){
-    rows+='<tr><td>'+(i+1)+'</td><td>'+d[i].name+'</td><td>'+d[i].ptObt+'</td><td>'+d[i].ptMax+'</td><td>'+d[i].pct.toFixed(1)+'%</td></tr>';
-  }
-  const now=new Date();
-  const dateStr=pad2(now.getDate())+'/'+pad2(now.getMonth()+1)+'/'+now.getFullYear()+' '+pad2(now.getHours())+':'+pad2(now.getMinutes());
-  document.getElementById('printZone').innerHTML=
-    '<h1>Cœurnohrad — Relevé de notes</h1>'+
-    '<p class="pdate">Généré le '+dateStr+'</p>'+
-    '<table><thead><tr><th>#</th><th>Cours</th><th>Pt obtenu</th><th>Pt max</th><th>%</th></tr></thead><tbody>'+rows+'</tbody></table>'+
-    '<div class="psum">'+
-      '<p><b>Total obtenu :</b> '+s.sumObt.toFixed(2)+' / '+s.sumMax.toFixed(2)+'</p>'+
-      '<p><b>Pourcentage global :</b> '+s.globalPct.toFixed(2)+'%</p>'+
-      '<p><b>Meilleur résultat :</b> '+s.best.name+' ('+s.best.pct.toFixed(1)+'%)</p>'+
-      '<p><b>Moins bon résultat :</b> '+s.worst.name+' ('+s.worst.pct.toFixed(1)+'%)</p>'+
-      '<p><b>Appréciation :</b> '+s.mention+'</p>'+
-    '</div>'+
-    '<p class="pfoot">Cœurnohrad — Document généré automatiquement</p>';
-  document.body.classList.add('printing');
-  window.print();
-  setTimeout(function(){document.body.classList.remove('printing');},500);
+  const body=d.map((r,i)=>[String(i+1),r.name,String(r.ptObt),String(r.ptMax),r.pct.toFixed(1)+'%']);
+  buildPdf('Relevé de notes','Cœurnohrad — '+pdfNowDate(),[
+    {type:'table',head:['#','Cours','Pt obtenu','Pt max','%'],body:body},
+    {type:'summary',pairs:[
+      ['Total obtenu',s.sumObt.toFixed(2)+' / '+s.sumMax.toFixed(2)],
+      ['Pourcentage global',s.globalPct.toFixed(2)+'%'],
+      ['Meilleur résultat',s.best.name+' ('+s.best.pct.toFixed(1)+'%)'],
+      ['Moins bon résultat',s.worst.name+' ('+s.worst.pct.toFixed(1)+'%)'],
+      ['Appréciation',s.mention,true]
+    ]}
+  ],'coeurnoh-notes.pdf');
 }
 
 // ============================================================
@@ -1503,34 +1853,217 @@ function calcEpargne(){
 }
 
 // ============================================================
-// CARBURANT
+// SEUIL DE RENTABILITÉ (point mort)
 // ============================================================
-function setFuelMode(m){fuelMode=m;document.querySelectorAll('.chtab').forEach((el,i)=>el.classList.toggle('active',['conso','cout'][i]===m));document.getElementById('fuelConso').style.display=m==='conso'?'block':'none';document.getElementById('fuelCout').style.display=m==='cout'?'block':'none';}
-function calcFuel(){
-  const d=parseFloat(document.getElementById('fDist').value);
-  const l=parseFloat(document.getElementById('fLit').value);
-  if(isNaN(d)||isNaN(l)||d<=0||l<=0)return;
-  const conso=l/d*100;
-  document.getElementById('fConso').textContent=conso.toFixed(2)+' L/100km';
-  document.getElementById('fKpl').textContent=(d/l).toFixed(2)+' km/L';
-  let cat='';
-  if(conso<5)cat='🌿 Très économique';else if(conso<7)cat='✅ Économique';else if(conso<10)cat='⚠️ Moyen';else if(conso<14)cat='🔴 Élevé';else cat='💸 Très élevé';
-  document.getElementById('fCat').textContent=cat;
-  const pct=Math.min((conso/20)*100,100);
-  document.getElementById('fuelBar').style.width=pct+'%';
-  document.getElementById('fuelConsoR').style.display='block';pkCalc();
+function calcRentab(){
+  const fixe=parseFloat(document.getElementById('rbFixe').value);
+  const pv=parseFloat(document.getElementById('rbPv').value);
+  const cv=parseFloat(document.getElementById('rbCv').value)||0;
+  if(isNaN(fixe)||isNaN(pv)||fixe<0||pv<=0){document.getElementById('rentabR').style.display='none';document.getElementById('rentabErr').style.display='none';return;}
+  const margeUnit=pv-cv;
+  if(margeUnit<=0){document.getElementById('rentabR').style.display='none';document.getElementById('rentabErr').style.display='block';return;}
+  document.getElementById('rentabErr').style.display='none';
+  const unites=Math.ceil(fixe/margeUnit);
+  const ca=unites*pv;
+  const taux=margeUnit/pv*100;
+  document.getElementById('rbUnites').textContent=unites;
+  document.getElementById('rbCA').textContent=ca.toFixed(2);
+  document.getElementById('rbMarge').textContent=margeUnit.toFixed(2);
+  document.getElementById('rbTaux').textContent=taux.toFixed(1)+'%';
+  document.getElementById('rentabR').style.display='block';pkCalc();
 }
-function calcCout(){
-  const d=parseFloat(document.getElementById('fDist2').value);
-  const c=parseFloat(document.getElementById('fCons2').value);
-  const p=parseFloat(document.getElementById('fPrix').value);
-  if(isNaN(d)||isNaN(c)||isNaN(p))return;
-  const lit=d*c/100,tot=lit*p;
-  document.getElementById('fTot').textContent=tot.toFixed(2);
-  document.getElementById('fLitNec').textContent=lit.toFixed(2)+' L';
-  document.getElementById('fC100').textContent=(c*p).toFixed(2);
-  document.getElementById('fAR').textContent=(tot*2).toFixed(2);
-  document.getElementById('fuelCoutR').style.display='block';pkCalc();
+
+// ============================================================
+// QR CODE
+// ============================================================
+let qrMode='lien';
+function setQrMode(m){
+  qrMode=m;
+  document.querySelectorAll('#panelQrcode .chtab').forEach((el,i)=>el.classList.toggle('active',['lien','wa'][i]===m));
+  document.getElementById('qrLienW').style.display=m==='lien'?'block':'none';
+  document.getElementById('qrWaW').style.display=m==='wa'?'block':'none';
+  document.getElementById('qrResult').style.display='none';
+}
+function qrAutoClear(){document.getElementById('qrResult').style.display='none';}
+function genQR(){
+  let content='';
+  if(qrMode==='lien'){
+    content=(document.getElementById('qrTxt').value||'').trim();
+  }else{
+    const num=(document.getElementById('qrWaNum').value||'').replace(/[^\d+]/g,'');
+    const msg=(document.getElementById('qrWaMsg').value||'').trim();
+    if(!num)return;
+    content='https://wa.me/'+num.replace(/^\+/,'')+(msg?('?text='+encodeURIComponent(msg)):'');
+  }
+  if(!content)return;
+  const holder=document.getElementById('qrCanvasHolder');
+  holder.innerHTML='';
+  if(typeof QRCode==='undefined'){
+    document.getElementById('qrContentPreview').textContent="⚠️ Le générateur QR n'a pas pu se charger — vérifiez votre connexion internet puis réessayez.";
+    document.getElementById('qrResult').style.display='block';
+    return;
+  }
+  new QRCode(holder,{text:content,width:220,height:220,colorDark:'#0d0d0f',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.H});
+  document.getElementById('qrContentPreview').textContent=content;
+  document.getElementById('qrResult').style.display='block';pkCalc();
+}
+function downloadQR(){
+  const holder=document.getElementById('qrCanvasHolder');
+  const canvas=holder.querySelector('canvas');
+  const img=holder.querySelector('img');
+  const a=document.createElement('a');
+  a.download='coeurnoh-qrcode.png';
+  if(canvas)a.href=canvas.toDataURL('image/png');
+  else if(img)a.href=img.src;
+  else return;
+  document.body.appendChild(a);a.click();document.body.removeChild(a);
+}
+
+// ============================================================
+// RÉSEAUX SOCIAUX — compteur de caractères
+// ============================================================
+const SOC_LIMITS=[
+  {name:'X (Twitter) — post',limit:280},
+  {name:'Instagram — légende',limit:2200},
+  {name:'Instagram — bio',limit:150},
+  {name:'TikTok — légende',limit:2200},
+  {name:'TikTok — bio',limit:80},
+  {name:'Facebook — publication',limit:63206}
+];
+function calcSocial(){
+  const txt=document.getElementById('socTxt').value||'';
+  const chars=txt.length;
+  const words=txt.trim()?txt.trim().split(/\s+/).length:0;
+  document.getElementById('socChars').textContent=chars;
+  document.getElementById('socWords').textContent=words;
+  const list=document.getElementById('socList');
+  list.innerHTML='';
+  SOC_LIMITS.forEach(p=>{
+    const ok=chars<=p.limit;
+    const rest=p.limit-chars;
+    const row=document.createElement('div');
+    row.className='soc-row';
+    row.innerHTML='<span class="soc-name">'+p.name+'</span><span class="soc-status '+(ok?'ok':'bad')+'">'+(ok?('✅ reste '+rest):('❌ dépasse de '+Math.abs(rest)))+'</span>';
+    list.appendChild(row);
+  });
+}
+
+// ============================================================
+// MONDE — Heure & météo par ville (Open-Meteo, gratuit, sans clé)
+// ============================================================
+let mdSeq=0;
+function mdQuickSearch(name){
+  document.getElementById('mdQuery').value=name;
+  mdSearch(name);
+}
+async function mdSearch(q){
+  document.getElementById('mdQuery').blur();
+  document.getElementById('mdResult').style.display='none';
+  document.getElementById('mdErr').style.display='none';
+  document.getElementById('mdSuggest').style.display='none';
+  if(!q||q.length<2){
+    document.getElementById('mdErr').textContent='⚠️ Tapez au moins 2 lettres du nom de la ville ou du pays.';
+    document.getElementById('mdErr').style.display='block';
+    return;
+  }
+  document.getElementById('mdErr').textContent="⚠️ Ville introuvable, pas de connexion internet, ou l'app n'est pas encore ouverte via son lien en ligne. Vérifiez l'orthographe ou votre réseau.";
+  const mySeq=++mdSeq;
+  const sug=document.getElementById('mdSuggest');
+  document.getElementById('mdLoading').style.display='block';
+  try{
+    const ctrl=new AbortController();
+    const tId=setTimeout(()=>ctrl.abort(),8000);
+    const r=await fetch('https://geocoding-api.open-meteo.com/v1/search?name='+encodeURIComponent(q)+'&count=6&language=fr&format=json',{signal:ctrl.signal});
+    clearTimeout(tId);
+    if(mySeq!==mdSeq)return;
+    if(!r.ok)throw new Error('http');
+    const d=await r.json();
+    const results=d.results||[];
+    if(!results.length){document.getElementById('mdErr').style.display='block';return;}
+    if(results.length===1){
+      await mdSelectPlace(results[0]);
+      return;
+    }
+    sug.innerHTML='';
+    results.forEach(res=>{
+      const item=document.createElement('div');
+      item.className='md-suggest-item';
+      const region=[res.admin1,res.country].filter(Boolean).join(', ');
+      item.innerHTML='<b>'+esc(res.name)+'</b><span>'+esc(region)+'</span>';
+      item.onclick=()=>mdSelectPlace(res);
+      sug.appendChild(item);
+    });
+    sug.style.display='block';
+  }catch(e){
+    if(mySeq!==mdSeq)return;
+    document.getElementById('mdErr').style.display='block';
+  }finally{
+    if(mySeq===mdSeq)document.getElementById('mdLoading').style.display='none';
+  }
+}
+async function mdSelectPlace(res){
+  document.getElementById('mdQuery').value=res.name+(res.country?(', '+res.country):'');
+  document.getElementById('mdSuggest').style.display='none';
+  document.getElementById('mdLoading').style.display='block';
+  document.getElementById('mdResult').style.display='none';
+  document.getElementById('mdErr').style.display='none';
+  try{
+    const ctrl=new AbortController();
+    const tId=setTimeout(()=>ctrl.abort(),8000);
+    const url='https://api.open-meteo.com/v1/forecast?latitude='+res.latitude+'&longitude='+res.longitude+'&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m&timezone=auto';
+    const r=await fetch(url,{signal:ctrl.signal});
+    clearTimeout(tId);
+    if(!r.ok)throw new Error('http');
+    const d=await r.json();
+    mdRender(res,d);
+  }catch(e){
+    document.getElementById('mdErr').style.display='block';
+  }finally{
+    document.getElementById('mdLoading').style.display='none';
+  }
+}
+function wmoToText(code){
+  const map={
+    0:['☀️','Ciel dégagé'],1:['🌤️','Plutôt dégagé'],2:['⛅','Partiellement nuageux'],3:['☁️','Couvert'],
+    45:['🌫️','Brouillard'],48:['🌫️','Brouillard givrant'],
+    51:['🌦️','Bruine légère'],53:['🌦️','Bruine'],55:['🌦️','Bruine forte'],
+    56:['🌦️','Bruine verglaçante'],57:['🌦️','Bruine verglaçante forte'],
+    61:['🌧️','Pluie légère'],63:['🌧️','Pluie'],65:['🌧️','Pluie forte'],
+    66:['🌧️','Pluie verglaçante'],67:['🌧️','Pluie verglaçante forte'],
+    71:['❄️','Neige légère'],73:['❄️','Neige'],75:['❄️','Neige forte'],77:['❄️','Grains de neige'],
+    80:['🌦️','Averses légères'],81:['🌦️','Averses'],82:['🌦️','Averses fortes'],
+    85:['🌨️','Averses de neige'],86:['🌨️','Averses de neige fortes'],
+    95:['⛈️','Orage'],96:['⛈️','Orage avec grêle'],99:['⛈️','Orage violent avec grêle']
+  };
+  return map[code]||['🌡️','Conditions inconnues'];
+}
+function mdRender(res,d){
+  const cur=d.current||{};
+  const place=[res.name,res.admin1,res.country].filter(Boolean).join(', ');
+  document.getElementById('mdPlace').textContent=place;
+  let timeStr='—',dateStr='';
+  if(cur.time){
+    const dt=new Date(cur.time);
+    timeStr=pad2(dt.getHours())+':'+pad2(dt.getMinutes());
+    const jours=['dimanche','lundi','mardi','mercredi','jeudi','vendredi','samedi'];
+    const mois=['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
+    dateStr=jours[dt.getDay()]+' '+dt.getDate()+' '+mois[dt.getMonth()];
+  }
+  let decalTxt='';
+  if(typeof d.utc_offset_seconds==='number'){
+    const localOffset=-new Date().getTimezoneOffset()*60;
+    const diffH=Math.round((d.utc_offset_seconds-localOffset)/360)/10;
+    decalTxt=Math.abs(diffH)<0.05?'Même heure que vous':(diffH>0?'+':'')+diffH+'h par rapport à vous';
+  }
+  document.getElementById('mdTime').textContent=timeStr;
+  document.getElementById('mdDate').textContent=dateStr+(decalTxt?(' · '+decalTxt):'');
+  const wx=wmoToText(cur.weather_code);
+  document.getElementById('mdWxLbl').textContent=wx[1]+' '+wx[0];
+  document.getElementById('mdTemp').textContent=(cur.temperature_2m!==undefined?cur.temperature_2m+'°C':'—');
+  document.getElementById('mdHum').textContent=(cur.relative_humidity_2m!==undefined?cur.relative_humidity_2m+'%':'—');
+  document.getElementById('mdWind').textContent=(cur.wind_speed_10m!==undefined?cur.wind_speed_10m+' km/h':'—');
+  document.getElementById('mdResult').style.display='block';
+  pkCalc();
 }
 
 // ============================================================
@@ -1683,24 +2216,379 @@ function calcDevis(){
 }
 function exportDevisPDF(){
   const d=window._lastDevis;if(!d)return;
-  let rows='';
-  d.lines.forEach((l,i)=>{rows+='<tr><td>'+(i+1)+'</td><td>'+esc(l.desc)+'</td><td>'+l.qte+'</td><td>'+l.pu.toFixed(2)+'</td><td>'+l.tot.toFixed(2)+'</td></tr>';});
-  const now=new Date();
-  const dateStr=pad2(now.getDate())+'/'+pad2(now.getMonth()+1)+'/'+now.getFullYear();
-  document.getElementById('printZone').innerHTML=
-    '<h1>'+esc(d.ent)+'</h1>'+
-    '<p class="pdate">Devis N° '+esc(d.num)+' — '+dateStr+' — Client : '+esc(d.client)+'</p>'+
-    '<table><thead><tr><th>#</th><th>Description</th><th>Qté</th><th>Prix U.</th><th>Total</th></tr></thead><tbody>'+rows+'</tbody></table>'+
-    '<div class="psum">'+
-      '<p><b>Sous-total HT :</b> '+d.sumHT.toFixed(2)+' '+esc(d.devise)+'</p>'+
-      (d.tvaP>0?'<p><b>TVA ('+d.tvaP+'%) :</b> '+d.tvaM.toFixed(2)+' '+esc(d.devise)+'</p>':'')+
-      '<p><b>Total à payer :</b> '+d.ttc.toFixed(2)+' '+esc(d.devise)+'</p>'+
-    '</div>'+
-    '<p class="pfoot">Document généré via Coeurnoh Pro</p>';
-  document.body.classList.add('printing');
-  window.print();
-  setTimeout(function(){document.body.classList.remove('printing');},500);
+  const body=d.lines.map((l,i)=>[String(i+1),l.desc,String(l.qte),l.pu.toFixed(2),l.tot.toFixed(2)]);
+  buildPdf(d.ent,'Devis N° '+d.num+' — Client : '+d.client+' — '+pdfNowDate(),[
+    {type:'table',head:['#','Description','Qté','Prix U.','Total'],body:body},
+    {type:'summary',pairs:[
+      ['Sous-total HT',d.sumHT.toFixed(2)+' '+d.devise],
+      ...(d.tvaP>0?[['TVA ('+d.tvaP+'%)',d.tvaM.toFixed(2)+' '+d.devise]]:[]),
+      ['Total à payer',d.ttc.toFixed(2)+' '+d.devise,true]
+    ]}
+  ],'coeurnoh-devis-'+(d.num||'doc')+'.pdf');
 }
+
+// ============================================================
+// COMPTABILITÉ — Journal / Grand livre + Bilan
+// ============================================================
+let cptMode='journal';
+function setCptMode(m){
+  cptMode=m;
+  document.querySelectorAll('#panelCompta .chtab').forEach((el,i)=>el.classList.toggle('active',['journal','bilan'][i]===m));
+  document.getElementById('cptJournalW').style.display=m==='journal'?'block':'none';
+  document.getElementById('cptBilanW').style.display=m==='bilan'?'block':'none';
+}
+let cptCount=0;
+function addCptRow(){
+  cptCount++;
+  const d=document.createElement('div');d.className='cpt-row';d.id='cr'+cptCount;
+  d.innerHTML='<input class="inp" type="text" placeholder="Ex: Vente de marchandises">'+
+    '<input class="inp" type="number" placeholder="0.00" min="0" step="0.01">'+
+    '<input class="inp" type="number" placeholder="0.00" min="0" step="0.01">'+
+    '<button class="note-del" onclick="delCptRow(\'cr'+cptCount+'\')">✕</button>';
+  document.getElementById('cptList').appendChild(d);pk(500,'sine',.05);
+}
+function delCptRow(id){const el=document.getElementById(id);if(el)el.remove();}
+function calcCompta(){
+  const rows=document.querySelectorAll('#cptList .cpt-row');
+  let totDebit=0,totCredit=0,lines=[];
+  rows.forEach(row=>{
+    const inputs=row.querySelectorAll('input');
+    const lib=(inputs[0].value||'').trim();
+    const deb=parseFloat(inputs[1].value)||0;
+    const cre=parseFloat(inputs[2].value)||0;
+    if(lib&&(deb>0||cre>0)){totDebit+=deb;totCredit+=cre;lines.push({lib,deb,cre});}
+  });
+  if(!lines.length){document.getElementById('cptR').style.display='none';return;}
+  const solde=totDebit-totCredit;
+  document.getElementById('cptDebit').textContent=totDebit.toFixed(2);
+  document.getElementById('cptCredit').textContent=totCredit.toFixed(2);
+  document.getElementById('cptSoldeLbl').textContent=solde>=0?'Solde débiteur':'Solde créditeur';
+  document.getElementById('cptSolde').textContent=Math.abs(solde).toFixed(2);
+  window._lastCompta={lines,totDebit,totCredit,solde};
+  document.getElementById('cptR').style.display='block';pkCalc();
+}
+function exportComptaPDF(){
+  const d=window._lastCompta;if(!d)return;
+  const body=d.lines.map((l,i)=>[String(i+1),l.lib,l.deb>0?l.deb.toFixed(2):'—',l.cre>0?l.cre.toFixed(2):'—']);
+  buildPdf('Journal comptable','Cœurnohrad — '+pdfNowDate(),[
+    {type:'table',head:['#','Libellé','Débit','Crédit'],body:body},
+    {type:'summary',pairs:[
+      ['Total Débit',d.totDebit.toFixed(2)],
+      ['Total Crédit',d.totCredit.toFixed(2)],
+      [(d.solde>=0?'Solde débiteur':'Solde créditeur'),Math.abs(d.solde).toFixed(2),true]
+    ]}
+  ],'coeurnoh-journal.pdf');
+}
+let bilCount=0;
+function addBilRow(side){
+  bilCount++;
+  const d=document.createElement('div');d.className='bil-row';d.id='br'+bilCount;
+  d.innerHTML='<input class="inp" type="text" placeholder="'+(side==='actif'?'Ex: Caisse, Stock, Matériel':'Ex: Capital, Emprunt, Fournisseurs')+'">'+
+    '<input class="inp" type="number" placeholder="0.00" min="0" step="0.01">'+
+    '<button class="note-del" onclick="delCptRow(\'br'+bilCount+'\')">✕</button>';
+  document.getElementById(side==='actif'?'bilActifList':'bilPassifList').appendChild(d);pk(500,'sine',.05);
+}
+function calcBilan(){
+  const sumSide=id=>{
+    let tot=0,lines=[];
+    document.querySelectorAll('#'+id+' .bil-row').forEach(row=>{
+      const inputs=row.querySelectorAll('input');
+      const lib=(inputs[0].value||'').trim();
+      const mt=parseFloat(inputs[1].value)||0;
+      if(lib&&mt>0){tot+=mt;lines.push({lib,mt});}
+    });
+    return {tot,lines};
+  };
+  const actif=sumSide('bilActifList'),passif=sumSide('bilPassifList');
+  if(!actif.lines.length&&!passif.lines.length){document.getElementById('bilR').style.display='none';return;}
+  document.getElementById('bilActifTot').textContent=actif.tot.toFixed(2);
+  document.getElementById('bilPassifTot').textContent=passif.tot.toFixed(2);
+  const ecart=actif.tot-passif.tot;
+  const statusEl=document.getElementById('bilStatus');
+  if(Math.abs(ecart)<0.01){
+    statusEl.className='bil-status ok';
+    statusEl.textContent='✅ Bilan équilibré — Actif = Passif';
+  }else{
+    statusEl.className='bil-status bad';
+    statusEl.textContent='⚠️ Écart de '+Math.abs(ecart).toFixed(2)+' — '+(ecart>0?'l\'Actif dépasse le Passif':'le Passif dépasse l\'Actif');
+  }
+  window._lastBilan={actif,passif,ecart};
+  document.getElementById('bilR').style.display='block';pkCalc();
+}
+function exportBilanPDF(){
+  const d=window._lastBilan;if(!d)return;
+  const bodyA=d.actif.lines.map((l,i)=>[String(i+1),l.lib,l.mt.toFixed(2)]);
+  const bodyP=d.passif.lines.map((l,i)=>[String(i+1),l.lib,l.mt.toFixed(2)]);
+  buildPdf('Bilan comptable','Cœurnohrad — '+pdfNowDate(),[
+    {type:'label',text:'ACTIF'},
+    {type:'table',head:['#','Libellé','Montant'],body:bodyA},
+    {type:'label',text:'PASSIF'},
+    {type:'table',head:['#','Libellé','Montant'],body:bodyP},
+    {type:'summary',pairs:[
+      ['Total Actif',d.actif.tot.toFixed(2)],
+      ['Total Passif',d.passif.tot.toFixed(2)],
+      [Math.abs(d.ecart)<0.01?'Bilan équilibré':'Écart',Math.abs(d.ecart)<0.01?'✅ Oui':Math.abs(d.ecart).toFixed(2),true]
+    ]}
+  ],'coeurnoh-bilan.pdf');
+}
+
+// ============================================================
+// INVENTAIRE / STOCK
+// ============================================================
+let invCount=0;
+function addInvRow(){
+  invCount++;
+  const d=document.createElement('div');d.className='inv-row';d.id='ir'+invCount;
+  d.innerHTML='<input class="inp" type="text" placeholder="Nom du produit">'+
+    '<div class="inv-grid">'+
+      '<input class="inp" type="number" placeholder="Qté" min="0" step="1">'+
+      '<input class="inp" type="number" placeholder="Achat" min="0" step="0.01">'+
+      '<input class="inp" type="number" placeholder="Vente" min="0" step="0.01">'+
+      '<input class="inp" type="text" placeholder="—" disabled style="opacity:.7">'+
+      '<button class="note-del" onclick="delInvRow(\'ir'+invCount+'\')">✕</button>'+
+    '</div>';
+  document.getElementById('invList').appendChild(d);pk(500,'sine',.05);
+}
+function delInvRow(id){const el=document.getElementById(id);if(el)el.remove();}
+function calcInventaire(){
+  const rows=document.querySelectorAll('#invList .inv-row');
+  let nb=0,valAchat=0,valVente=0,lines=[];
+  rows.forEach(row=>{
+    const nom=(row.querySelector('input[type=text]').value||'').trim();
+    const inputs=row.querySelectorAll('.inv-grid input');
+    const qte=parseFloat(inputs[0].value)||0;
+    const pa=parseFloat(inputs[1].value)||0;
+    const pv=parseFloat(inputs[2].value)||0;
+    const va=qte*pa,vv=qte*pv;
+    inputs[3].value=qte>0?va.toFixed(2):'—';
+    if(nom&&qte>0){nb+=qte;valAchat+=va;valVente+=vv;lines.push({nom,qte,pa,pv,va,vv});}
+  });
+  if(!lines.length){document.getElementById('invR').style.display='none';return;}
+  document.getElementById('invNb').textContent=nb;
+  document.getElementById('invValAchat').textContent=valAchat.toFixed(2);
+  document.getElementById('invValVente').textContent=valVente.toFixed(2);
+  document.getElementById('invMarge').textContent=(valVente-valAchat).toFixed(2);
+  window._lastInventaire={lines,nb,valAchat,valVente};
+  document.getElementById('invR').style.display='block';pkCalc();
+}
+function exportInventairePDF(){
+  const d=window._lastInventaire;if(!d)return;
+  const body=d.lines.map((l,i)=>[String(i+1),l.nom,String(l.qte),l.pa.toFixed(2),l.pv.toFixed(2),l.va.toFixed(2)]);
+  buildPdf('Inventaire du stock','Cœurnohrad — '+pdfNowDate(),[
+    {type:'table',head:['#','Produit','Qté','P. Achat','P. Vente','Valeur'],body:body},
+    {type:'summary',pairs:[
+      ['Nombre d\'articles',String(d.nb)],
+      ['Valeur du stock (achat)',d.valAchat.toFixed(2)],
+      ['Valeur potentielle (vente)',d.valVente.toFixed(2)],
+      ['Marge potentielle totale',(d.valVente-d.valAchat).toFixed(2),true]
+    ]}
+  ],'coeurnoh-inventaire.pdf');
+}
+
+// ============================================================
+// TABLEAU EXCEL — mini-tableur avec export PDF + CSV
+// ============================================================
+let excCount=0;
+function addExcRow(){
+  excCount++;
+  const d=document.createElement('div');d.className='cpt-row';d.id='er'+excCount;
+  d.style.gridTemplateColumns='2fr 1fr auto';
+  d.innerHTML='<input class="inp" type="text" placeholder="Ex: Vente du lundi">'+
+    '<input class="inp" type="number" placeholder="0.00" step="0.01">'+
+    '<button class="note-del" onclick="delRow(\'er'+excCount+'\')">✕</button>';
+  document.getElementById('excList').appendChild(d);pk(500,'sine',.05);
+}
+function calcExcel(){
+  const rows=document.querySelectorAll('#excList .cpt-row');
+  let vals=[],lines=[];
+  rows.forEach(row=>{
+    const inputs=row.querySelectorAll('input');
+    const lib=(inputs[0].value||'').trim();
+    const v=parseFloat(inputs[1].value);
+    if(lib&&!isNaN(v)){vals.push(v);lines.push({lib,v});}
+  });
+  if(!vals.length){document.getElementById('excR').style.display='none';return;}
+  const sum=vals.reduce((a,b)=>a+b,0);
+  const avg=sum/vals.length;
+  const max=Math.max(...vals),min=Math.min(...vals);
+  document.getElementById('excNb').textContent=vals.length;
+  document.getElementById('excSum').textContent=sum.toFixed(2);
+  document.getElementById('excAvg').textContent=avg.toFixed(2);
+  document.getElementById('excMax').textContent=max.toFixed(2);
+  document.getElementById('excMin').textContent=min.toFixed(2);
+  window._lastExcel={lines,sum,avg,max,min};
+  document.getElementById('excR').style.display='block';pkCalc();
+}
+function exportExcelPDF(){
+  const d=window._lastExcel;if(!d)return;
+  const body=d.lines.map((l,i)=>[String(i+1),l.lib,l.v.toFixed(2)]);
+  buildPdf('Tableau de calcul','Cœurnohrad — '+pdfNowDate(),[
+    {type:'table',head:['#','Libellé','Valeur'],body:body},
+    {type:'summary',pairs:[
+      ['Somme totale',d.sum.toFixed(2)],
+      ['Moyenne',d.avg.toFixed(2)],
+      ['Maximum',d.max.toFixed(2)],
+      ['Minimum',d.min.toFixed(2),true]
+    ]}
+  ],'coeurnoh-tableau.pdf');
+}
+function exportExcelCSV(){
+  const d=window._lastExcel;if(!d)return;
+  let csv='Libellé,Valeur\r\n';
+  d.lines.forEach(l=>{csv+='"'+l.lib.replace(/"/g,'""')+'",'+l.v+'\r\n';});
+  csv+='\r\nSomme,'+d.sum+'\r\nMoyenne,'+d.avg+'\r\nMaximum,'+d.max+'\r\nMinimum,'+d.min+'\r\n';
+  const blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;a.download='coeurnoh-tableau.csv';
+  document.body.appendChild(a);a.click();document.body.removeChild(a);
+  setTimeout(()=>URL.revokeObjectURL(url),2000);
+}
+
+// ============================================================
+// PLAN COMPTABLE OHADA (SYSCOHADA) — comptes principaux de référence
+// ============================================================
+const PC_DATA=[
+// CLASSE 1 — Comptes de ressources durables
+{c:'1',code:'10',lib:'Capital'},
+{c:'1',code:'101',lib:'Capital social'},
+{c:'1',code:'104',lib:'Primes liées au capital social'},
+{c:'1',code:'106',lib:'Écarts de réévaluation'},
+{c:'1',code:'11',lib:'Réserves indisponibles'},
+{c:'1',code:'12',lib:'Report à nouveau'},
+{c:'1',code:'13',lib:'Résultat net de l\'exercice'},
+{c:'1',code:'14',lib:'Subventions d\'investissement'},
+{c:'1',code:'15',lib:'Provisions réglementées'},
+{c:'1',code:'16',lib:'Emprunts et dettes assimilées'},
+{c:'1',code:'161',lib:'Emprunts obligataires'},
+{c:'1',code:'162',lib:'Emprunts auprès des établissements de crédit'},
+{c:'1',code:'17',lib:'Dettes de crédit-bail et contrats assimilés'},
+{c:'1',code:'19',lib:'Provisions financières pour risques et charges'},
+// CLASSE 2 — Comptes d'actif immobilisé
+{c:'2',code:'20',lib:'Charges immobilisées'},
+{c:'2',code:'21',lib:'Immobilisations incorporelles'},
+{c:'2',code:'211',lib:'Frais de développement et de prospection'},
+{c:'2',code:'212',lib:'Brevets, licences, logiciels, concessions'},
+{c:'2',code:'22',lib:'Terrains'},
+{c:'2',code:'23',lib:'Bâtiments, installations techniques, agencements'},
+{c:'2',code:'24',lib:'Matériel'},
+{c:'2',code:'241',lib:'Matériel et outillage industriel'},
+{c:'2',code:'244',lib:'Matériel et mobilier de bureau'},
+{c:'2',code:'245',lib:'Matériel de transport'},
+{c:'2',code:'25',lib:'Avances et acomptes versés sur immobilisations'},
+{c:'2',code:'26',lib:'Titres de participation'},
+{c:'2',code:'27',lib:'Autres immobilisations financières'},
+{c:'2',code:'28',lib:'Amortissements'},
+{c:'2',code:'29',lib:'Dépréciations des immobilisations'},
+// CLASSE 3 — Comptes de stocks
+{c:'3',code:'31',lib:'Marchandises'},
+{c:'3',code:'32',lib:'Matières premières et fournitures liées'},
+{c:'3',code:'33',lib:'Autres approvisionnements'},
+{c:'3',code:'34',lib:'Produits en cours'},
+{c:'3',code:'35',lib:'Services en cours'},
+{c:'3',code:'36',lib:'Produits finis'},
+{c:'3',code:'37',lib:'Produits intermédiaires et résiduels'},
+{c:'3',code:'38',lib:'Stocks en cours de route, en consignation'},
+{c:'3',code:'39',lib:'Dépréciations des stocks'},
+// CLASSE 4 — Comptes de tiers
+{c:'4',code:'40',lib:'Fournisseurs et comptes rattachés'},
+{c:'4',code:'401',lib:'Fournisseurs, dettes en compte'},
+{c:'4',code:'408',lib:'Fournisseurs, factures non parvenues'},
+{c:'4',code:'41',lib:'Clients et comptes rattachés'},
+{c:'4',code:'411',lib:'Clients'},
+{c:'4',code:'416',lib:'Clients douteux ou litigieux'},
+{c:'4',code:'42',lib:'Personnel'},
+{c:'4',code:'421',lib:'Personnel, avances et acomptes'},
+{c:'4',code:'422',lib:'Personnel, rémunérations dues'},
+{c:'4',code:'43',lib:'Organismes sociaux'},
+{c:'4',code:'44',lib:'État et collectivités publiques'},
+{c:'4',code:'441',lib:'État, impôt sur les bénéfices'},
+{c:'4',code:'443',lib:'État, TVA facturée'},
+{c:'4',code:'445',lib:'État, TVA récupérable'},
+{c:'4',code:'446',lib:'État, autres taxes'},
+{c:'4',code:'46',lib:'Associés et groupe'},
+{c:'4',code:'47',lib:'Débiteurs et créditeurs divers'},
+{c:'4',code:'48',lib:'Créances et dettes hors activités ordinaires (H.A.O.)'},
+{c:'4',code:'49',lib:'Dépréciations et risques provisionnés (comptes de tiers)'},
+// CLASSE 5 — Comptes de trésorerie
+{c:'5',code:'50',lib:'Titres de placement'},
+{c:'5',code:'52',lib:'Banques'},
+{c:'5',code:'521',lib:'Banques locales'},
+{c:'5',code:'531',lib:'Chèques postaux'},
+{c:'5',code:'57',lib:'Caisse'},
+{c:'5',code:'571',lib:'Caisse siège social'},
+{c:'5',code:'58',lib:'Régies d\'avances, accréditifs et virements internes'},
+{c:'5',code:'59',lib:'Dépréciations des comptes de trésorerie'},
+// CLASSE 6 — Comptes de charges des activités ordinaires
+{c:'6',code:'60',lib:'Achats et variations de stocks'},
+{c:'6',code:'601',lib:'Achats de marchandises'},
+{c:'6',code:'602',lib:'Achats de matières premières et fournitures liées'},
+{c:'6',code:'605',lib:'Autres achats'},
+{c:'6',code:'61',lib:'Transports'},
+{c:'6',code:'62',lib:'Services extérieurs A (locations, entretien, assurances…)'},
+{c:'6',code:'63',lib:'Services extérieurs B (publicité, télécommunications, honoraires…)'},
+{c:'6',code:'64',lib:'Impôts et taxes'},
+{c:'6',code:'65',lib:'Autres charges'},
+{c:'6',code:'66',lib:'Charges de personnel'},
+{c:'6',code:'661',lib:'Rémunérations directes versées au personnel'},
+{c:'6',code:'667',lib:'Charges sociales'},
+{c:'6',code:'67',lib:'Frais financiers'},
+{c:'6',code:'68',lib:'Dotations aux amortissements'},
+{c:'6',code:'69',lib:'Dotations aux provisions'},
+// CLASSE 7 — Comptes de produits des activités ordinaires
+{c:'7',code:'70',lib:'Ventes'},
+{c:'7',code:'701',lib:'Ventes de marchandises'},
+{c:'7',code:'702',lib:'Ventes de produits finis'},
+{c:'7',code:'706',lib:'Services vendus'},
+{c:'7',code:'71',lib:'Subventions d\'exploitation'},
+{c:'7',code:'72',lib:'Production immobilisée'},
+{c:'7',code:'73',lib:'Variations des stocks de produits'},
+{c:'7',code:'75',lib:'Autres produits'},
+{c:'7',code:'77',lib:'Revenus financiers'},
+{c:'7',code:'78',lib:'Reprises de provisions'},
+{c:'7',code:'79',lib:'Transferts de charges'},
+// CLASSE 8 — Autres charges et produits (hors activités ordinaires)
+{c:'8',code:'81',lib:'Valeurs comptables des cessions d\'immobilisations'},
+{c:'8',code:'82',lib:'Produits des cessions d\'immobilisations'},
+{c:'8',code:'83',lib:'Charges hors activités ordinaires (H.A.O.)'},
+{c:'8',code:'84',lib:'Produits hors activités ordinaires (H.A.O.)'},
+{c:'8',code:'87',lib:'Participation des travailleurs'},
+{c:'8',code:'89',lib:'Impôts sur le résultat'}
+];
+let pcClass='all';
+function setPcClass(c){
+  pcClass=c;
+  document.querySelectorAll('#panelPlancompta .tb').forEach(b=>b.classList.toggle('active',b.dataset.c===c));
+  renderPlanCompta();
+}
+function renderPlanCompta(){
+  const q=(document.getElementById('pcSearch').value||'').trim().toLowerCase();
+  const filtered=PC_DATA.filter(r=>{
+    if(pcClass!=='all'&&r.c!==pcClass)return false;
+    if(q&&!(r.code.includes(q)||r.lib.toLowerCase().includes(q)))return false;
+    return true;
+  });
+  document.getElementById('pcCount').textContent=filtered.length+' compte(s) affiché(s)';
+  const list=document.getElementById('pcList');
+  list.innerHTML=filtered.map(r=>
+    '<div class="dev-trow" style="border-bottom:1px solid rgba(255,255,255,.06);padding:8px 2px;">'+
+      '<span><b style="color:var(--ac3);font-family:\'Space Mono\',monospace;">'+r.code+'</b> — '+esc(r.lib)+'</span>'+
+    '</div>'
+  ).join('')||'<div class="rate-note">Aucun compte trouvé pour cette recherche.</div>';
+}
+function exportPlanComptaPDF(){
+  const q=(document.getElementById('pcSearch').value||'').trim().toLowerCase();
+  const filtered=PC_DATA.filter(r=>{
+    if(pcClass!=='all'&&r.c!==pcClass)return false;
+    if(q&&!(r.code.includes(q)||r.lib.toLowerCase().includes(q)))return false;
+    return true;
+  });
+  const body=filtered.map(r=>[r.code,r.lib,'Classe '+r.c]);
+  buildPdf('Plan comptable général SYSCOHADA (OHADA)','Comptes principaux à titre de référence — '+pdfNowDate(),[
+    {type:'table',head:['Code','Intitulé','Classe'],body:body}
+  ],'coeurnoh-plan-ohada.pdf');
+}
+function delRow(id){const el=document.getElementById(id);if(el)el.remove();}
 
 // ============================================================
 // KEYBOARD
@@ -1756,6 +2644,24 @@ function openInstallModal(){
 }
 function closeInstallModal(){document.getElementById('installModal').classList.remove('open');}
 
+// ============================================================
+// PARTAGER L'APPLICATION
+// ============================================================
+async function shareApp(){
+  const url=window.location.href;
+  const shareData={title:'Coeurnoh Pro — Calculatrice Pro',text:'Une calculatrice tout-en-un gratuite : change de devises en temps réel, devis/facture, comptabilité, inventaire et plus. Installe-la comme une vraie app :',url:url};
+  const btn=document.getElementById('shareBtn');
+  if(navigator.share){
+    try{await navigator.share(shareData);return;}catch(e){/* annulé ou indisponible -> repli copie */}
+  }
+  const ok=await copyToClipboard(url);
+  if(btn){
+    const old=btn.textContent;
+    btn.textContent=ok?'✅':'⚠️';
+    setTimeout(()=>{btn.textContent=old;},1500);
+  }
+}
+
 // Service worker (actif uniquement si la page est servie via http/https — sans effet en local)
 if('serviceWorker' in navigator){
   window.addEventListener('load',()=>{
@@ -1769,8 +2675,8 @@ if('serviceWorker' in navigator){
 renderHist();updateCol('#7b2fff');
 const now=new Date();
 document.getElementById('aRef').value=pad2(now.getDate())+'/'+pad2(now.getMonth()+1)+'/'+now.getFullYear();
-setVM('v');genPwd();initConv();setShape('rect');
-addNoteRow();addNoteRow();addNoteRow();
+genPwd();initConv();setShape('rect');
+if(!restoreContainer('notesList')){addNoteRow();addNoteRow();addNoteRow();}
 </script>
 </body>
 </html>
